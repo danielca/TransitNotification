@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">StopNotification</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="notify">Notify Me!</string>
+    <string name="stopNo">Enter Stop Number</string>
+
+    <item name="databaseVersion" format="integer" type="string">1</item>
+
+    <string name="title_activity_stop_notification">StopNotification</string>
+    <string name="no_fused">\"Error\"</string>
+    <string name="title_activity_stop_location">StopLocation</string>
+
+</resources>
