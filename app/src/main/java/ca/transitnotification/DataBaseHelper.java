@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +21,8 @@ import java.io.OutputStream;
  */
 
 public class DataBaseHelper extends SQLiteOpenHelper {
-    private static String DB_PATH = "/data/data/ca.transitnotification/databases/";
+    //private static String DB_PATH = "/data/data/ca.transitnotification/databases/";
+    private static String DB_PATH;
     private static String DB_NAME = "stops.db";
     private SQLiteDatabase myDataBase;
     private final Context myContext;
@@ -34,6 +36,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public DataBaseHelper(Context context) {
         super(context, DB_NAME, null, 1);
         this.myContext = context;
+        //DB_PATH = this.getDatabase
+        DB_PATH = context.getFilesDir().getPath();
+        DB_PATH = DB_PATH.substring(0, DB_PATH.lastIndexOf("/")) + "/databases/";
+        Log.i(TAG, "PATH IS " + DB_PATH);
     }
 
     /**
@@ -62,19 +68,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * @return true if it exists, false if it doesn't
      */
     private boolean checkDataBase() {
-        SQLiteDatabase checkDB = null;
+        //SQLiteDatabase checkDB;
         try{
             String myPath = DB_PATH + DB_NAME;
-            checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
-        }catch (SQLiteException e) {
+            File dbFile = new File(DB_PATH, DB_NAME);
+            if (dbFile.exists()) {
+                //checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+                SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+            } else {
+                return false;
+            }
+        } catch (SQLiteException e) {
             return false;
         }
 
-        if(checkDB != null) {
-            checkDB.close();
-        }
-
-        return checkDB != null;
+        //if(checkDB != null) {
+        //    checkDB.close();
+        //}
+        return true;
+        //return checkDB != null;
     }
 
     /**

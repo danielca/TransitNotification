@@ -10,7 +10,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -20,15 +19,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.AlertDialog;
+import static java.lang.Double.*;
 
 
 public class StopLocation extends ActionBarActivity {
     LocationManager locationManager;
     LocationListener locationListener;
-    protected double stopLat;
-    protected double stopLon;
-    protected String stopName;
-    protected String stopNumber;
+    private double stopLat;
+    private double stopLon;
+    private String stopName;
+    private String stopNumber;
     double selectedDistance = 100; // Hardcoded for now....
     long minTime = (long) 0.5;
     float minDistance = 50;
@@ -42,15 +42,15 @@ public class StopLocation extends ActionBarActivity {
 
         Log.d(TAG, "Starting the stop location activity");
 
-        Stop stop = null;
+        //Stop stop = null;
         //get the stop
         Intent intent;
         intent = getIntent();
         Bundle extras = intent.getExtras();
-        if (intent != null) {
+        if (extras != null) {
             //stop = intent.getParcelableExtra("SelectedStop");
-            stopLat = Double.parseDouble(extras.getString("StopLat"));
-            stopLon = Double.parseDouble(extras.getString("StopLon"));
+            stopLat = parseDouble(extras.getString("StopLat"));
+            stopLon = parseDouble(extras.getString("StopLon"));
             stopName = extras.getString("StopName");
             stopNumber = extras.getString("StopNumber");
 
@@ -93,8 +93,10 @@ public class StopLocation extends ActionBarActivity {
                 double newLon = location.getLongitude();
 
                 double distacneToStop = getDistance(newLat, stopLat, newLon, stopLon);
+                Log.i(TAG, "Current distance is " + distacneToStop);
                 if (distacneToStop < selectedDistance) {
                     sendNotification();
+                    locationManager.removeUpdates(locationListener);
                 }
 
 

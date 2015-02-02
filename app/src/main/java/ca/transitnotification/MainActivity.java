@@ -95,7 +95,7 @@ public class MainActivity extends ActionBarActivity {
             String Query = String.format("SELECT * FROM Stop WHERE Stop_Num = %s", selectedStop);
             result = stopDataBase.getReadableDatabase().rawQuery(Query, null);
             while (result.moveToNext()) {
-                int id = result.getInt(0);
+                //int id = result.getInt(0);
                 // next values are for debug
                 String stopNo = result.getString(1);
                 String stopName = result.getString(2);
@@ -110,7 +110,7 @@ public class MainActivity extends ActionBarActivity {
                 stop.setLon(result.getString(4));
                 Log.d(TAG, "looked for " + selectedStop + " found stop " + stop.toString());
 
-                assert stop != null;
+                //assert stop != null;
 
                 //Start the new activity
                 Intent intent = new Intent(this, StopLocation.class);
@@ -130,7 +130,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-
 }
+
 
 
