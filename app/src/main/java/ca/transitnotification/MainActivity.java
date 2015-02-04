@@ -1,6 +1,16 @@
 package ca.transitnotification;
+/*
+ * Need a spot for a to do list so here it is
+ * TODO:
+ * - Add a fav list so user can save common stops
+ * - Add in some preferences for distance, maybe ringtone?
+ * - Add animation for the loading of the database
+ * - Adds/IAP
+ */
 
-
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -85,6 +95,22 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void noResults() {
+        final Context appContext = MainActivity.this;
+        AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
+        builder.setMessage("No Stops found")
+                .setCancelable(false)
+                .setPositiveButton("Go BAck", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.i(TAG, "no result found, showing alert dialog");
+                        Intent gpsOptionsIntent = new Intent(appContext, MainActivity.class);
+                        startActivity(gpsOptionsIntent);
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     public void notificationClick() {
 
         String selectedStop = enteredStopNumber.getText().toString();
@@ -94,6 +120,14 @@ public class MainActivity extends ActionBarActivity {
             Cursor result;
             String Query = String.format("SELECT * FROM Stop WHERE Stop_Num = %s", selectedStop);
             result = stopDataBase.getReadableDatabase().rawQuery(Query, null);
+
+            Log.i(TAG,"Found this many results " + result.getCount());
+            //Make sure the stop is found in the database
+            if (result.getCount() < 1) {
+                Log.i(TAG, "No results found");
+                noResults();
+            }
+
             while (result.moveToNext()) {
                 //int id = result.getInt(0);
                 // next values are for debug
