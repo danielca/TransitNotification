@@ -1,6 +1,15 @@
 package ca.transitnotification;
-/*
- * Need a spot for a to do list so here it is
+/**
+ * Main Activyt
+ *
+ * So here is the main activity where the user enters the stop number and moves on to
+ * StopLocation.java.
+ * The database handling is also done here
+ *
+ * Changelog:
+ *  Febuary 9:
+ *      - Added in a listener for the enter button when entering a stop number.
+ *
  * TODO:
  * - Add a fav list so user can save common stops
  * - Add in some preferences for distance, maybe ringtone?
@@ -17,6 +26,7 @@ import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +41,7 @@ public class MainActivity extends ActionBarActivity {
     private EditText enteredStopNumber;
     private DataBaseHelper stopDataBase;
 
-    private static final String TAG = "StopNotificationMainActivity";
+    private static final String TAG = "StopNotification";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +69,19 @@ public class MainActivity extends ActionBarActivity {
         Button notificationButton = (Button) findViewById(R.id.startNotification);
         enteredStopNumber = (EditText)findViewById(R.id.stopNumber);
 
+        //handle when the user presses the enter button
+        enteredStopNumber.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    notificationClick();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         //start an on click listner
         notificationButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -76,7 +99,8 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return false;
     }
 
@@ -89,6 +113,7 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

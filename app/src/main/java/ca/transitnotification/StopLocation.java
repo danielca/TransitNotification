@@ -1,16 +1,23 @@
 package ca.transitnotification;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+/**
+ * Stop Location Class
+ *
+ * This class handles the UI, and stares the foreground process for the lcoation tracking
+ *
+ * Created By:Casey Daniel
+ *
+ * Changelog:
+ *  Febuary 9:
+ *      -Moved location tracking to foreground service located in ForegroundService.java
+ *
+ */
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,15 +31,11 @@ import static java.lang.Double.*;
 
 public class StopLocation extends ActionBarActivity {
     LocationManager locationManager;
-    LocationListener locationListener;
-    private double stopLat;
-    private double stopLon;
-    private String stopName;
-    private String stopNumber;
-    double selectedDistance = 100; // Hardcoded for now....
-    long minTime = (long) 0.5;
-    float minDistance = 50;
-    private String TAG = "StopLocation";
+    double stopLat;
+    double stopLon;
+    String stopName;
+    String stopNumber;
+    private static final String TAG = "StopNotification";
 
 
     @Override
@@ -85,62 +88,37 @@ public class StopLocation extends ActionBarActivity {
             showSettingsAlert();
         }
 
+        Log.i(TAG,"Starting the foreground service");
+        //start the foreground service
+        Intent startForeground = new Intent(this, ForegroundService.class);
+        startForeground.putExtra("StopName", stopName);
+        startForeground.putExtra("StopNumber", stopNumber);
+        startForeground.putExtra("StopLat", String.valueOf(stopLat));
+        startForeground.putExtra("StopLon", String.valueOf(stopLon));
+        startService(startForeground);
+        Log.i(TAG, "Started the foreground service");
 
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                double newLat = location.getLatitude();
-                double newLon = location.getLongitude();
-
-                double distacneToStop = getDistance(newLat, stopLat, newLon, stopLon);
-                Log.i(TAG, "Current distance is " + distacneToStop);
-                if (distacneToStop < selectedDistance) {
-                    sendNotification();
-                    locationManager.removeUpdates(locationListener);
-                }
-
-
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, locationListener );
-
-        Button notificationButton = (Button) findViewById(R.id.cancel);
+        Button notificationButton;
+        notificationButton = (Button) findViewById(R.id.cancel);
         //start an on click listner for canceling the notification
         notificationButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        cancelNotification();
+                        stopService(new Intent(getApplicationContext(), ForegroundService.class));
                     }
                 }
         );
 
         //set the text view in the layout so that it will display the stop number and name
         TextView textView = (TextView) findViewById(R.id.DisplaySelectedStop);
-        textView.setText("Will notify you at stop numnber " + stopNumber + " at " + stopName);
+        textView.setText("Will notify you at stop number " + stopNumber + " at " + stopName);
 
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        locationManager.removeUpdates(locationListener);
     }
 
 
@@ -166,55 +144,9 @@ public class StopLocation extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private double getDistance(double lat1, double lat2, double lon1, double lon2) {
-        /**
-         * Method to compute the distance between two locations
-         */
-        double R = 6371; // Radius of th earth in meters
-        double dlat = (lat2 - lat1) * (Math.PI / 180.0);
-        double dlon = (lon2 - lon1) * (Math.PI / 180.0);
-        double a = Math.sin(dlat/2) * Math.sin(dlat/2) + Math.cos(lat2 * (Math.PI / 180.0)) *
-                Math.cos(lat1 * (Math.PI / 180.0)) * Math.sin(dlon/2) * Math.sin(dlon/2);
-        double c = 2 * Math.atan(Math.sqrt(a));
-        return Math.abs(R * c * 1000);
-    }
 
-    private void sendNotification() {
-        /**
-         * Method to notify the user of there stop
-         * TODO:
-         *  -Set strings to android strings
-         *  -get launcher Icon
-         */
 
-        Log.i(TAG, "Starting the notification");
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
 
-        notificationBuilder.setAutoCancel(true).setDefaults(Notification.DEFAULT_ALL);
-
-        notificationBuilder.setContentTitle("You are close to your stop!")
-                .setContentText("Get ready to depart")
-                .setTicker("Your stop is close!")
-                .setSmallIcon(R.drawable.ic_launcher);
-
-        Intent intent = new Intent(this, StopLocation.class);
-
-        notificationBuilder.setContentIntent(PendingIntent.getActivity(this,0,intent,0));
-
-        NotificationManager notficationManager =
-                (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
-        int NOTIFCATION_ID = 0;
-        notficationManager.notify(NOTIFCATION_ID, notificationBuilder.build());
-
-    }
-
-    private void cancelNotification() {
-        Log.i(TAG, "Canceling the notification from hitting the button");
-        locationManager.removeUpdates(locationListener);
-        Intent backIntent = new Intent(this, MainActivity.class);
-        startActivity(backIntent);
-    }
 
     public void showSettingsAlert() {
         /*
@@ -246,6 +178,7 @@ public class StopLocation extends ActionBarActivity {
 
 
     }
+
 
 }
 

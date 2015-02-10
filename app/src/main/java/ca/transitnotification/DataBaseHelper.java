@@ -26,7 +26,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static String DB_NAME = "stops.db";
     private SQLiteDatabase myDataBase;
     private final Context myContext;
-    private static String TAG = "StopNotificationMainActivity";
+    private static final String TAG = "StopNotification";
 
     /**
      * Constructor

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name = "selectedDistance">
+        <item name = "50">50 Meters</item>
+        <item name = "75">75 Meters</item>
+        <item name = "100">100 Meters</item>
+        <item name = "125">125 Meters</item>
+        <item name = "150">150 Meters</item>
+        <item name = "175">175 Meters</item>
+        <item name = "200">200 Meters</item>
+    </string-array>
+
+    <string-array name = "selectedDistanceValues">
+        <item name = "50">50</item>
+        <item name = "75">75</item>
+        <item name = "100">100</item>
+        <item name = "125">125</item>
+        <item name = "150">150</item>
+        <item name = "175">175</item>
+        <item name = "200">200</item>
+    </string-array>
+
+</resources>
